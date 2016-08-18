@@ -1,0 +1,3 @@
+# -*- mode: org; mode: auto-fill -*-
+
+It's my golang tests.
