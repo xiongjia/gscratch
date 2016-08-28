@@ -3,15 +3,22 @@ package main
 import (
 	"fmt"
 	gscratch "github.com/xiongjia/gscratch"
+	logger "github.com/xiongjia/gscratch/logger"
 )
 
 var (
-	log = gscratch.LogCreate()
+	log = logger.New("gscratch")
 )
 
+func init() {
+	fmt.Println("main init")
+}
+
 func main() {
+	// logLevel := flag.String("logLevel", "info", "Log level (debbug, error, info)")
+	// flag.Parse()
+	// fmt.Printf("%s\n", *logLevel)
 	fmt.Println("gscratch")
 	gscratch.GTest()
-
-	log.Infof("Log test %s", "abc")
+	log.Infof("test %d", 1)
 }
