@@ -1,7 +1,9 @@
 package logger
 
 import (
-	log "github.com/Sirupsen/logrus"
+	logrus "github.com/Sirupsen/logrus"
+	"path/filepath"
+	"runtime"
 )
 
 type LogLevel uint8
@@ -13,14 +15,29 @@ const (
 	DebugLevel
 )
 
-type Logger struct {
-	level LogLevel
-	entry *log.Entry
+var (
+	curLevel LogLevel = InfoLevel
+)
+
+func SetLevel(level LogLevel) {
+	curLevel = level
 }
 
-func New(section string) *Logger {
+func init() {
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetFormatter(&logrus.TextFormatter{})
+}
+
+type Logger struct {
+	level LogLevel
+	entry *logrus.Entry
+}
+
+func New(tag string) *Logger {
+	_, srcFile, _, _ := runtime.Caller(0)
+	srcFileBase := filepath.Base(srcFile)
 	return &Logger{
-		entry: log.WithFields(log.Fields{"section": section}),
+		entry: logrus.WithFields(logrus.Fields{"tag": tag, "src": srcFileBase}),
 		level: InfoLevel,
 	}
 }
@@ -30,13 +47,19 @@ func (logger *Logger) Errorf(fmt string, args ...interface{}) {
 }
 
 func (logger *Logger) Warnf(fmt string, args ...interface{}) {
-	logger.entry.Warnf(fmt, args...)
+	if curLevel >= WarnLevel {
+		logger.entry.Warnf(fmt, args...)
+	}
 }
 
 func (logger *Logger) Infof(fmt string, args ...interface{}) {
-	logger.entry.Infof(fmt, args...)
+	if curLevel >= InfoLevel {
+		logger.entry.Infof(fmt, args...)
+	}
 }
 
 func (logger *Logger) Debugf(fmt string, args ...interface{}) {
-	logger.entry.Debugf(fmt, args...)
+	if curLevel >= DebugLevel {
+		logger.entry.Debugf(fmt, args...)
+	}
 }
